@@ -9,7 +9,7 @@ if [ ! -e $BASEDIR/lastversion ]
 then
     echo "0" >> $BASEDIR/lastversion
 fi
-LASTVER=$(cat /srv/buildd/lastversion)
+LASTVER=$(cat $BASEDIR/lastversion)
 export DEBFULLNAME="Michael Andersen"
 export DEBEMAIL="m.andersen@berkeley.edu"
 REPO="http://smap-data.googlecode.com/svn/trunk/"
@@ -63,7 +63,6 @@ cd ..
 #This key is Michael Andersen's software signing key
 debsign -k6E82A804 smap_*.changes
 cd $WORKDIR/smap/python/dist
-echo "Would dput"
 dput ppa:mandersen/smap smap*.changes
 echo $CURVER > $BASEDIR/lastversion
 echo "Completed revision $CURVER"
