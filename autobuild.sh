@@ -3,7 +3,7 @@
 # Pull the latest version of the sMAP source, and build a deb of it if the version is higher
 # than what we last had
 
-BASEDIR=/srv/buildd
+BASEDIR=/srv/buildd/smap
 WORKDIR=$BASEDIR/$(date +"%d.%m.%y_%H_%M")
 if [ ! -e $BASEDIR/lastversion ]
 then
