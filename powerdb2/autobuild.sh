@@ -40,11 +40,12 @@ cp $BASEDIR/debian/changelog $WORKDIR/powerdb2/debian/changelog
 cp $BASEDIR/debian/compat $WORKDIR/powerdb2/debian/compat
 
 cd $WORKDIR/powerdb2
+sed -i "s/^\\(VERSION=\\).*\$/\1$CURVER/g" Makefile
 make dist
 make builddeb
 
-exit 1
-cd ..
+cd $WORKDIR/powerdb2/dist/
+
 #This key is Michael Andersen's software signing key
 debsign -k6E82A804 powerdb2*.changes
 dput ppa:mandersen/smap powerdb2*.changes
