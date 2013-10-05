@@ -81,7 +81,8 @@ cp $BASEDIR/py/debian/compat $WORKDIR/readingdb/python/debian/compat
 cp $BASEDIR/py/Makefile $WORKDIR/readingdb/python/Makefile
 
 cd $WORKDIR/readingdb/python/
-dpkg-buildpackage -rfakeroot -uc -us -S
+#dpkg-buildpackage -rfakeroot -uc -us -S
+make builddeb
 cd $WORKDIR/readingdb/
 debsign -k6E82A804 readingdb-python*.changes
 dput ppa:mandersen/smap readingdb-python*.changes
