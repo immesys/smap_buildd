@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-# Pull the latest version of the sMAP source, and build a deb of it if the version is higher
+# Pull the latest version of the sMAP powerdb2 source, and build a deb of it if the version is higher
 # than what we last had
 
 set -e
 
-BASEDIR=/srv/buildd/smap
+BASEDIR=/srv/buildd/powerdb2
 WORKDIR=$BASEDIR/$(date +"%d.%m.%y_%H_%M")
 if [ ! -e $BASEDIR/lastversion ]
 then
@@ -14,7 +14,7 @@ fi
 LASTVER=$(cat $BASEDIR/lastversion)
 export DEBFULLNAME="Michael Andersen"
 export DEBEMAIL="m.andersen@berkeley.edu"
-REPO="http://smap-data.googlecode.com/svn/trunk/"
+REPO="http://smap-data.googlecode.com/svn/branches/powerdb2"
 
 mkdir -p $WORKDIR
 cd $WORKDIR
@@ -27,36 +27,27 @@ then
     exit 1
 fi
 
-svn co $REPO smap
-cd $WORKDIR/smap/
+svn co $REPO powerdb2
+cd $WORKDIR/powerdb2/
+
 LASTLOG=$(svn log | head -n 4 | tail -n 1)
 
 #Copy in our local changelog
 cd $BASEDIR
 dch --distribution raring -v 2.0.$CURVER --check-dirname-level 0 "commit-msg: $LASTLOG"
 
-cp $BASEDIR/debian/changelog $WORKDIR/smap/python/debian/changelog
-cp $BASEDIR/debian/control $WORKDIR/smap/python/debian/control
+cp $BASEDIR/debian/changelog $WORKDIR/powerdb2/debian/changelog
+cp $BASEDIR/debian/compat $WORKDIR/powerdb2/debian/compat
 
-cd $WORKDIR/smap/python
+cd $WORKDIR/powerdb2
+make dist
+make builddeb
 
-#Taken from SDH's publish-deb
-rm -rf dist
-rm -rf smap/schema
-cp -rp ../schema smap
-python setup.py sdist
-
-cd dist
-tar zxvf *.tar.gz
-SOURCE=$(find . -maxdepth 1 -type d -name 'Smap*' -print )
-echo source dir is  $SOURCE
-cd $SOURCE
-dpkg-buildpackage -rfakeroot -uc -us -S
+exit 1
 cd ..
 #This key is Michael Andersen's software signing key
-debsign -k6E82A804 smap_*.changes
-cd $WORKDIR/smap/python/dist
-dput ppa:mandersen/smap smap*.changes
+debsign -k6E82A804 powerdb2*.changes
+dput ppa:mandersen/smap powerdb2*.changes
+
 echo $CURVER > $BASEDIR/lastversion
 echo "Completed revision $CURVER"
-

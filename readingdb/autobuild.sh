@@ -60,6 +60,7 @@ dpkg-buildpackage -rfakeroot -uc -us -S
 #This key is Michael Andersen's software signing key
 cd $WORKDIR
 debsign -k6E82A804 readingdb_*.changes
+#dput ppa:mandersen/smap readingdb_*.changes
 
 #---------------------
 # A'ight lets do the python part
@@ -77,9 +78,9 @@ cp $BASEDIR/py/Makefile $WORKDIR/readingdb/python/
 
 cd $WORKDIR/readingdb/python/
 dpkg-buildpackage -rfakeroot -uc -us -S
-
-echo "Would dput"
-#dput ppa:mandersen/smap smap*.changes
+cd $WORKDIR/readingdb/
+debsign -k6E82A804 readingdb-python*.changes
+#dput ppa:mandersen/smap readingdb-python*.changes
 
 echo $LASTCOMMIT > $BASEDIR/lastversion
 
