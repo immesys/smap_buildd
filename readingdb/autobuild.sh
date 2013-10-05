@@ -33,7 +33,7 @@ LASTLOG=$(git log -n 1 --format=oneline)
 if [ $LASTVER = $LASTCOMMIT ]
 then
     echo "Last commit has already been processed"
-    exit 1
+    exit 0
 fi
 
 DBID=$($BASEDIR/../gitversion.py $REPO $LASTCOMMIT $VERSION)

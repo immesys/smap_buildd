@@ -24,7 +24,7 @@ echo "Head version is $CURVER"
 if [ $CURVER -le $LASTVER ]
 then
     echo "Repository has not been updated"
-    exit 1
+    exit 0
 fi
 
 svn co $REPO smap
