@@ -10,21 +10,24 @@
 # usage
 # python gitversion.py <repository> <changeset_id> 
 import sys
-from pymongo import MongoClient
+from pymongo import MongoClient, ASCENDING, DESCENDING
 client = MongoClient()
 
-if len(sys.argv) != 3:
-    print "Usage: gitversion.py <repository> <changeset_id>"
+if len(sys.argv) != 4:
+    print "Usage: gitversion.py <repository> <changeset_id> <version>"
     sys.exit(1)
 
 if len(sys.argv[1]) != 40:
     print "Please use the 40 character hex changeset id"
     sys.exit(1)
       
-next = client.gitversions.ids.find_one({"db_id":-1})["db_id"] + 1
-if next is None:
+lastdoc = list(client.gitversions.ids.find({}).sort("db_id", DESCENDING).limit(1))
+if len(lastdoc) == 0:
+    print "No id's found, initialising at zero"
     next = 0
-nextdoc = {"db_id":next, "repo":sys.argv[0], "changeset":sys.argv[1]}
+else:
+    next = lastdoc[0]["db_id"]+1
+nextdoc = {"db_id":next, "repo":sys.argv[0], "changeset":sys.argv[1], "version":sys.argv[2]}
 
 client.gitversions.ids.save(nextdoc)
 print next
