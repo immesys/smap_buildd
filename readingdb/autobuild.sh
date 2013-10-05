@@ -47,6 +47,7 @@ FULLVER+=git$DBID
 dch --distribution raring -v $FULLVER --check-dirname-level 0 "git($REPO): $LASTLOG"
 
 cp $BASEDIR/debian/changelog $WORKDIR/readingdb/debian/changelog
+# These two are about to be sent upstream to SDH so may not be necessary
 cp $BASEDIR/debian/control $WORKDIR/readingdb/debian/control
 cp $BASEDIR/debian/compat $WORKDIR/readingdb/debian/compat
 
@@ -56,7 +57,7 @@ sed -i 's/^#\s*\(PKG_CHECK_MODULES.*\)$/\1/g' $WORKDIR/readingdb/src/hashtable/c
 
 cd $WORKDIR/readingdb
 dpkg-buildpackage -rfakeroot -uc -us -S
-#cd ..
+
 #This key is Michael Andersen's software signing key
 cd $WORKDIR
 debsign -k6E82A804 readingdb_*.changes
