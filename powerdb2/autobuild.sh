@@ -38,6 +38,7 @@ dch --distribution raring -v 2.0.$CURVER --check-dirname-level 0 "commit-msg: $L
 
 cp $BASEDIR/debian/changelog $WORKDIR/powerdb2/debian/changelog
 cp $BASEDIR/debian/compat $WORKDIR/powerdb2/debian/compat
+cp $BASEDIR/debian/control $WORKDIR/powerdb2/debian/control
 
 cd $WORKDIR/powerdb2
 sed -i "s/^\\(VERSION=\\).*\$/\1$CURVER/g" Makefile
