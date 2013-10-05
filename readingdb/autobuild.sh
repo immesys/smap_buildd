@@ -64,17 +64,21 @@ dput ppa:mandersen/smap readingdb_*.changes
 
 #---------------------
 # A'ight lets do the python part
+cd $WORKDIR/readingdb
+autoreconf --install
+./configure
+make
 
 cd $BASEDIR/py/
 dch --distribution raring -v $FULLVER --check-dirname-level 0 "git($REPO): $LASTLOG"
 
 cd $WORKDIR/readingdb/python
-python setup.py sdist
+
 cp $BASEDIR/py/debian/changelog $WORKDIR/readingdb/python/debian/changelog
 cp $BASEDIR/py/debian/control $WORKDIR/readingdb/python/debian/control
 cp $BASEDIR/py/debian/compat $WORKDIR/readingdb/python/debian/compat
 # There is currently a typo that I haven't sent upstream to Steve yet
-cp $BASEDIR/py/Makefile $WORKDIR/readingdb/python/
+cp $BASEDIR/py/Makefile $WORKDIR/readingdb/python/Makefile
 
 cd $WORKDIR/readingdb/python/
 dpkg-buildpackage -rfakeroot -uc -us -S

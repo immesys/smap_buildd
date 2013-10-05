@@ -23,7 +23,6 @@ if len(sys.argv[1]) != 40:
       
 lastdoc = list(client.gitversions.ids.find({}).sort("db_id", DESCENDING).limit(1))
 if len(lastdoc) == 0:
-    print "No id's found, initialising at zero"
     next = 0
 else:
     next = lastdoc[0]["db_id"]+1
@@ -32,3 +31,5 @@ nextdoc = {"db_id":next, "repo":sys.argv[0], "changeset":sys.argv[1], "version":
 client.gitversions.ids.save(nextdoc)
 print next
 sys.exit(0)
+
+
