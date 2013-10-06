@@ -20,11 +20,10 @@ export DEBEMAIL="m.andersen@berkeley.edu"
 
 mkdir -p $WORKDIR
 cd $WORKDIR
-echo "PWD is "`pwd`
-git clone $REPO readingdb
+git clone $REPO readingdb 2>&1
 
 cd readingdb
-git checkout $REPOBRANCH
+git checkout $REPOBRANCH 2>&1
 
 LASTCOMMIT=$(git log -n1 --format="%H")
 echo "LAST COMMIT IS: "$LASTCOMMIT
@@ -56,7 +55,7 @@ sed -i 's/^#\s*\(PKG_CHECK_MODULES.*\)$/\1/g' $WORKDIR/readingdb/configure.ac
 sed -i 's/^#\s*\(PKG_CHECK_MODULES.*\)$/\1/g' $WORKDIR/readingdb/src/hashtable/configure.ac
 
 cd $WORKDIR/readingdb
-dpkg-buildpackage -rfakeroot -uc -us -S
+dpkg-buildpackage -rfakeroot -uc -us -S 2>&1
 
 #This key is Michael Andersen's software signing key
 cd $WORKDIR
@@ -83,7 +82,7 @@ cp $BASEDIR/py/Makefile $WORKDIR/readingdb/python/Makefile
 
 cd $WORKDIR/readingdb/python/
 #dpkg-buildpackage -rfakeroot -uc -us -S
-make builddeb
+make builddeb 2>&1
 cd $WORKDIR/readingdb/
 debsign -k6E82A804 readingdb-python*.changes
 dput ppa:mandersen/smap readingdb-python*.changes
