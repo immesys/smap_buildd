@@ -46,14 +46,14 @@ cd $WORKDIR/smap/python
 rm -rf dist
 rm -rf smap/schema
 cp -rp ../schema smap
-python setup.py sdist
+python setup.py sdist 2>&1
 
 cd dist
 tar zxvf *.tar.gz
 SOURCE=$(find . -maxdepth 1 -type d -name 'Smap*' -print )
 echo source dir is  $SOURCE
 cd $SOURCE
-dpkg-buildpackage -rfakeroot -uc -us -S
+dpkg-buildpackage -rfakeroot -uc -us -S 2>&1
 cd ..
 #This key is Michael Andersen's software signing key
 debsign -k6E82A804 smap_*.changes
