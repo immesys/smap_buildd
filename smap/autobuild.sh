@@ -18,7 +18,11 @@ REPO="http://smap-data.googlecode.com/svn/trunk/"
 
 mkdir -p $WORKDIR
 cd $WORKDIR
-CURVER=$(($(svn info $REPO | grep "Revision" | cut -d ":" -f 2)))
+
+
+svn co $REPO smap
+cd $WORKDIR/smap/
+CURVER=$(($(svn info | grep "Last Changed Rev:" | cut -d ":" -f 2)))
 
 echo "Head version is $CURVER"
 if [ $CURVER -le $LASTVER ]
@@ -27,8 +31,6 @@ then
     exit 0
 fi
 
-svn co $REPO smap
-cd $WORKDIR/smap/
 LASTLOG=$(svn log | head -n 4 | tail -n 1)
 
 #Copy in our local changelog
