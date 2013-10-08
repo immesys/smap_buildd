@@ -18,7 +18,10 @@ REPO="http://smap-data.googlecode.com/svn/branches/powerdb2"
 
 mkdir -p $WORKDIR
 cd $WORKDIR
-CURVER=$(($(svn info $REPO | grep "Revision" | cut -d ":" -f 2)))
+
+svn co $REPO powerdb2
+cd $WORKDIR/powerdb2/
+CURVER=$(($(svn info | grep "Last Changed Rev:" | cut -d ":" -f 2)))
 
 echo "Head version is $CURVER"
 if [ $CURVER -le $LASTVER ]
@@ -26,9 +29,6 @@ then
     echo "Repository has not been updated"
     exit 0
 fi
-
-svn co $REPO powerdb2
-cd $WORKDIR/powerdb2/
 
 LASTLOG=$(svn log | head -n 4 | tail -n 1)
 
