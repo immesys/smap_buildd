@@ -1,4 +1,4 @@
-smap (2.0.598) raring; urgency=low
+smap (2.0.598) trusty; urgency=low
 
   * commit-msg: * bmo driver that uses twisted web2 client basic to
     avoid 403 redirect loop

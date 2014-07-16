@@ -1,14 +1,25 @@
 #!/usr/bin/env bash
 
-set -e
+
+
+
+
+
+
+
+
+set -ex
 
 # Pull the latest version of the readingdb source, and build a deb of it if the version is higher
 # than what we last had
-REPO="https://github.com/stevedh/readingdb.git"
-REPOBRANCH="microseconds"
-VERSION=0.6.0-6
-BASEDIR=/srv/buildd/readingdb
-WORKDIR=$BASEDIR/$(date +"%d.%m.%y_%H_%M")
+
+REPO="https://github.com/softwaredefinedbuildings/readingdb.git"
+
+REPOBRANCH=adaptive
+VERSION=0.6.1
+BASEDIR=/rust/buildd/readingdb
+mkdir -p $BASEDIR
+WORKDIR=$BASEDIR/build_$REPOBRANCH-$(date +"%d.%m.%y_%H_%M")
 if [ ! -e $BASEDIR/lastversion ]
 then
     echo "0" >> $BASEDIR/lastversion
@@ -16,7 +27,6 @@ fi
 LASTVER=$(cat $BASEDIR/lastversion)
 export DEBFULLNAME="Michael Andersen"
 export DEBEMAIL="m.andersen@berkeley.edu"
-
 
 mkdir -p $WORKDIR
 cd $WORKDIR
@@ -43,7 +53,7 @@ echo "Using -git$DBID for changeset $LASTCOMMIT from $REPO"
 cd $BASEDIR
 FULLVER=$VERSION
 FULLVER+=git$DBID
-dch --distribution raring -v $FULLVER --check-dirname-level 0 "git($REPO): $LASTLOG"
+dch --distribution trusty -v $FULLVER --check-dirname-level 0 "git($REPO:$REPOBRANCH): $LASTLOG"
 
 cp $BASEDIR/debian/changelog $WORKDIR/readingdb/debian/changelog
 # These two are about to be sent upstream to SDH so may not be necessary
@@ -59,8 +69,8 @@ dpkg-buildpackage -rfakeroot -uc -us -S 2>&1
 
 #This key is Michael Andersen's software signing key
 cd $WORKDIR
-debsign -k6E82A804 readingdb_*.changes
-dput ppa:mandersen/smap readingdb_*.changes
+debsign -k8B3731DC readingdb_*.changes
+dput ppa:cal-sdb/smap readingdb_*.changes
 
 #---------------------
 # A'ight lets do the python part
@@ -70,7 +80,7 @@ autoreconf --install
 make
 
 cd $BASEDIR/py/
-dch --distribution raring -v $FULLVER --check-dirname-level 0 "git($REPO): $LASTLOG"
+dch --distribution trusty -v $FULLVER --check-dirname-level 0 "git($REPO:$REPOBRANCH): $LASTLOG"
 
 cd $WORKDIR/readingdb/python
 
@@ -84,8 +94,8 @@ cd $WORKDIR/readingdb/python/
 #dpkg-buildpackage -rfakeroot -uc -us -S
 make builddeb 2>&1
 cd $WORKDIR/readingdb/
-debsign -k6E82A804 readingdb-python*.changes
-dput ppa:mandersen/smap readingdb-python*.changes
+debsign -k8B3731DC readingdb-python*.changes
+dput ppa:cal-sdb/smap readingdb-python*.changes
 
 echo $LASTCOMMIT > $BASEDIR/lastversion
 

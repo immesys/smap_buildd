@@ -1,3 +1,19 @@
+powerdb2 (2.2git15) trusty; urgency=low
+
+  * git(https://github.com/softwaredefinedbuildings/powerdb2.git:master)
+    : bb2ed62ffba86cf6e674cc3e16b3d3068c967878 svn->git port missed
+    these files :/
+
+ -- Michael Andersen <m.andersen@berkeley.edu>  Tue, 15 Jul 2014 20:33:32 -0700
+
+powerdb2 (2.2git14) raring; urgency=low
+
+  * git(https://github.com/softwaredefinedbuildings/powerdb2.git:master)
+    : bb2ed62ffba86cf6e674cc3e16b3d3068c967878 svn->git port missed
+    these files :/
+
+ -- Michael Andersen <m.andersen@berkeley.edu>  Tue, 15 Jul 2014 20:06:43 -0700
+
 powerdb2 (2.0.300-2) oneiric; urgency=low
 
   * Initial release 

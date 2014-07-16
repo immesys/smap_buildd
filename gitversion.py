@@ -17,7 +17,7 @@ if len(sys.argv) != 4:
     print "Usage: gitversion.py <repository> <changeset_id> <version>"
     sys.exit(1)
 
-if len(sys.argv[1]) != 40:
+if len(sys.argv[2]) != 40:
     print "Please use the 40 character hex changeset id"
     sys.exit(1)
       
@@ -26,7 +26,7 @@ if len(lastdoc) == 0:
     next = 0
 else:
     next = lastdoc[0]["db_id"]+1
-nextdoc = {"db_id":next, "repo":sys.argv[0], "changeset":sys.argv[1], "version":sys.argv[2]}
+nextdoc = {"db_id":next, "repo":sys.argv[1], "changeset":sys.argv[2], "version":sys.argv[3]}
 
 client.gitversions.ids.save(nextdoc)
 print next

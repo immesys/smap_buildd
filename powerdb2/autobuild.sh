@@ -1,12 +1,25 @@
 #!/usr/bin/env bash
 
+
+
+
+
 # Pull the latest version of the sMAP powerdb2 source, and build a deb of it if the version is higher
 # than what we last had
 
 set -e
 
-BASEDIR=/srv/buildd/powerdb2
-WORKDIR=$BASEDIR/$(date +"%d.%m.%y_%H_%M")
+
+
+
+
+REPO="https://github.com/softwaredefinedbuildings/powerdb2.git"
+
+REPOBRANCH=master
+VERSION=2.2
+BASEDIR=/rust/buildd/powerdb2
+mkdir -p $BASEDIR
+WORKDIR=$BASEDIR/build_$REPOBRANCH-$(date +"%d.%m.%y_%H_%M")
 if [ ! -e $BASEDIR/lastversion ]
 then
     echo "0" >> $BASEDIR/lastversion
@@ -14,42 +27,48 @@ fi
 LASTVER=$(cat $BASEDIR/lastversion)
 export DEBFULLNAME="Michael Andersen"
 export DEBEMAIL="m.andersen@berkeley.edu"
-REPO="http://smap-data.googlecode.com/svn/branches/powerdb2"
 
 mkdir -p $WORKDIR
 cd $WORKDIR
+git clone $REPO powerdb2 2>&1
 
-svn co $REPO powerdb2
-cd $WORKDIR/powerdb2/
-CURVER=$(($(svn info | grep "Last Changed Rev:" | cut -d ":" -f 2)))
+cd powerdb2
+git checkout $REPOBRANCH 2>&1
 
-echo "Head version is $CURVER"
-if [ $CURVER -le $LASTVER ]
+LASTCOMMIT=$(git log -n1 --format="%H")
+echo "LAST COMMIT IS: "$LASTCOMMIT
+LASTLOG=$(git log -n 1 --format=oneline)
+
+if [ $LASTVER = $LASTCOMMIT ]
 then
-    echo "Repository has not been updated"
+    echo "Last commit has already been processed"
     exit 0
 fi
 
-LASTLOG=$(svn log | head -n 4 | tail -n 1)
+DBID=$($BASEDIR/../gitversion.py $REPO $LASTCOMMIT $VERSION)
+
+echo "Using -git$DBID for changeset $LASTCOMMIT from $REPO"
 
 #Copy in our local changelog
 cd $BASEDIR
-dch --distribution raring -v 2.0.$CURVER --check-dirname-level 0 "commit-msg: $LASTLOG"
+FULLVER=$VERSION
+FULLVER+=git$DBID
+dch --distribution trusty -v $FULLVER --check-dirname-level 0 "git($REPO:$REPOBRANCH): $LASTLOG"
 
 cp $BASEDIR/debian/changelog $WORKDIR/powerdb2/debian/changelog
 cp $BASEDIR/debian/compat $WORKDIR/powerdb2/debian/compat
 cp $BASEDIR/debian/control $WORKDIR/powerdb2/debian/control
 
 cd $WORKDIR/powerdb2
-sed -i "s/^\\(VERSION=\\).*\$/\1$CURVER/g" Makefile
+sed -i "s/^\\(VERSION=\\).*\$/\1$VERSION/g" Makefile
 make dist
 make builddeb
 
 cd $WORKDIR/powerdb2/dist/
 
 #This key is Michael Andersen's software signing key
-debsign -k6E82A804 powerdb2*.changes
-dput ppa:mandersen/smap powerdb2*.changes
+debsign -k8B3731DC powerdb2*.changes
+dput ppa:cal-sdb/smap powerdb2*.changes
 
-echo $CURVER > $BASEDIR/lastversion
-echo "Completed revision $CURVER"
+echo $LASTCOMMIT > $BASEDIR/lastversion
+

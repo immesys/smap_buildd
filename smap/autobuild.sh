@@ -1,12 +1,25 @@
 #!/usr/bin/env bash
 
+
+
+
+
+
+
+
+
+set -ex
 # Pull the latest version of the sMAP source, and build a deb of it if the version is higher
 # than what we last had
 
-set -e
 
-BASEDIR=/srv/buildd/smap
-WORKDIR=$BASEDIR/$(date +"%d.%m.%y_%H_%M")
+REPO="https://github.com/softwaredefinedbuildings/smap.git"
+
+REPOBRANCH=unitoftime
+VERSION=2.2
+BASEDIR=/rust/buildd/smap
+mkdir -p $BASEDIR
+WORKDIR=$BASEDIR/build_$REPOBRANCH-$(date +"%d.%m.%y_%H_%M")
 if [ ! -e $BASEDIR/lastversion ]
 then
     echo "0" >> $BASEDIR/lastversion
@@ -14,28 +27,33 @@ fi
 LASTVER=$(cat $BASEDIR/lastversion)
 export DEBFULLNAME="Michael Andersen"
 export DEBEMAIL="m.andersen@berkeley.edu"
-REPO="http://smap-data.googlecode.com/svn/trunk/"
 
 mkdir -p $WORKDIR
 cd $WORKDIR
+git clone $REPO smap 2>&1
 
+cd smap
+git checkout $REPOBRANCH 2>&1
 
-svn co $REPO smap
-cd $WORKDIR/smap/
-CURVER=$(($(svn info | grep "Last Changed Rev:" | cut -d ":" -f 2)))
+LASTCOMMIT=$(git log -n1 --format="%H")
+echo "LAST COMMIT IS: "$LASTCOMMIT
+LASTLOG=$(git log -n 1 --format=oneline)
 
-echo "Head version is $CURVER"
-if [ $CURVER -le $LASTVER ]
+if [ $LASTVER = $LASTCOMMIT ]
 then
-    echo "Repository has not been updated"
+    echo "Last commit has already been processed"
     exit 0
 fi
 
-LASTLOG=$(svn log | head -n 4 | tail -n 1)
+DBID=$($BASEDIR/../gitversion.py $REPO $LASTCOMMIT $VERSION)
+
+echo "Using -git$DBID for changeset $LASTCOMMIT from $REPO"
 
 #Copy in our local changelog
 cd $BASEDIR
-dch --distribution raring -v 2.0.$CURVER --check-dirname-level 0 "commit-msg: $LASTLOG"
+FULLVER=$VERSION
+FULLVER+=git$DBID
+dch --distribution trusty -v $FULLVER --check-dirname-level 0 "git($REPO:$REPOBRANCH): $LASTLOG"
 
 cp $BASEDIR/debian/changelog $WORKDIR/smap/python/debian/changelog
 cp $BASEDIR/debian/control $WORKDIR/smap/python/debian/control
@@ -56,9 +74,9 @@ cd $SOURCE
 dpkg-buildpackage -rfakeroot -uc -us -S 2>&1
 cd ..
 #This key is Michael Andersen's software signing key
-debsign -k6E82A804 smap_*.changes
+debsign -k8B3731DC smap_*.changes
 cd $WORKDIR/smap/python/dist
-dput ppa:mandersen/smap smap*.changes
-echo $CURVER > $BASEDIR/lastversion
-echo "Completed revision $CURVER"
+dput ppa:cal-sdb/smap smap*.changes
+
+echo $LASTCOMMIT > $BASEDIR/lastversion
 
